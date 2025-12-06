@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Explore • UnseenRealm</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- MapLibre GL JS (FREE, NO API KEY) -->
+  <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body class="theme-dark">
+
+<header class="nav">
+  <div class="logo">Unseen<span>Realm</span></div>
+  <nav id="navLinks"></nav>
+</header>
+
+<main class="explore-page">
+
+  <!-- Header -->
+  <section class="explore-header">
+    <div>
+      <h1>Explore Vizag Experiences</h1>
+      <p>Smart recommendations visualized on a tilted 3D satellite map.</p>
+    </div>
+
+    <div class="pill-row">
+      <span class="pill small">Live Prototype</span>
+      <span class="pill small soft">MapLibre 3D</span>
+    </div>
+  </section>
+
+  <!-- Filters -->
+  <section class="explore-controls">
+    <div class="filter-group">
+      <label>Interests</label>
+      <div class="chip-row" id="interestFilters">
+        <button class="chip chip-active" data-interest="all">All</button>
+        <button class="chip" data-interest="food">Food</button>
+        <button class="chip" data-interest="culture">Culture</button>
+        <button class="chip" data-interest="nature">Nature</button>
+        <button class="chip" data-interest="nightlife">Nightlife</button>
+        <button class="chip" data-interest="adventure">Adventure</button>
+        <button class="chip" data-interest="budget">Budget</button>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <label for="moodFilter">Mood</label>
+      <select id="moodFilter" class="select">
+        <option value="any">Any mood</option>
+        <option value="chill">Chill</option>
+        <option value="social">Social</option>
+        <option value="adrenaline">Adrenaline</option>
+        <option value="budget">Budget</option>
+      </select>
+    </div>
+  </section>
+
+  <!-- Layout: Map + List -->
+  <section class="explore-layout">
+
+    <!-- MAP PANEL -->
+    <div class="map-panel">
+      <h2>Vizag 3D Satellite Map</h2>
+      <p class="muted tiny">Tilted at 45° for a clean, isometric look.</p>
+
+      <div id="map3d"></div>
+    </div>
+
+    <!-- LIST PANEL -->
+    <div class="list-panel">
+      <div class="list-header">
+        <h2>Suggestions</h2>
+        <p id="resultsCount" class="muted tiny">Loading...</p>
+      </div>
+
+      <div id="experienceList" class="experience-list"></div>
+    </div>
+
+  </section>
+</main>
+
+<footer class="footer">
+  <p>UnseenRealm © 2025 • Vizag Edition</p>
+</footer>
+
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyA7qrQeypEYFhKCvQjM-5PaMaYpTFJZ-mk",
+    authDomain: "unseenrealm-b43d9.firebaseapp.com",
+    projectId: "unseenrealm-b43d9",
+    storageBucket: "unseenrealm-b43d9.firebasestorage.app",
+    messagingSenderId: "893669581410",
+    appId: "1:893669581410:web:ebfdbdeacc27dced73673b",
+    measurementId: "G-6PH9HCPP9K"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+</script>
+
+<script src="app.js"></script>
+
+</body>
+</html>

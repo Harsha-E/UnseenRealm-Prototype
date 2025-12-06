@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Itinerary • UnseenRealm</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body class="theme-dark">
+
+  <!-- NAV -->
+  <header class="nav">
+    <div class="logo">Unseen<span>Realm</span></div>
+    <nav id="navLinks"></nav>
+  </header>
+
+  <!-- ITINERARY -->
+  <main class="itinerary-page">
+    <section class="itinerary-card">
+
+      <div class="itinerary-header">
+        <div>
+          <h1>Your Saved Path</h1>
+          <p class="muted tiny">
+            Spots you’ve saved along your journey. Plan your perfect outing.
+          </p>
+        </div>
+
+        <button id="clearItinerary" class="btn-sm">Clear All</button>
+      </div>
+
+      <div id="itineraryList" class="itinerary-list"></div>
+
+      <p id="itineraryStatus"
+         class="muted tiny"
+         style="margin-top:1rem;min-height:1em;"></p>
+
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>Your itinerary is synced locally and restored automatically.</p>
+  </footer>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+  <!-- Firebase Config -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA7qrQeypEYFhKCvQjM-5PaMaYpTFJZ-mk",
+      authDomain: "unseenrealm-b43d9.firebaseapp.com",
+      projectId: "unseenrealm-b43d9",
+      storageBucket: "unseenrealm-b43d9.firebasestorage.app",
+      messagingSenderId: "893669581410",
+      appId: "1:893669581410:web:ebfdbdeacc27dced73673b",
+      measurementId: "G-6PH9HCPP9K"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
+
+  <!-- App Logic -->
+  <script src="app.js"></script>
+
+</body>
+</html>

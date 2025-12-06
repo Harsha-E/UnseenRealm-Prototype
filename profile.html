@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Profile • UnseenRealm</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body class="theme-dark">
+
+  <!-- NAVBAR -->
+  <header class="nav">
+    <div class="logo">Unseen<span>Realm</span></div>
+    <nav id="navLinks"></nav>
+  </header>
+
+  <!-- PROFILE CARD -->
+  <main class="auth-page">
+    <section class="auth-card">
+      <h1>Your Travel DNA</h1>
+      <p id="profileWelcome" class="muted tiny">Loading your preferences...</p>
+
+      <form id="profileForm" class="auth-form">
+
+        <!-- INTERESTS -->
+        <div class="field-group">
+          <label>What are you into?</label>
+          <p class="muted tiny">Pick a few. This shapes your recommendation feed.</p>
+
+          <div id="interestCheckboxes" class="checkbox-grid">
+            <label class="check-pill">
+              <input type="checkbox" value="food" /><span>Food & cafés</span>
+            </label>
+            <label class="check-pill">
+              <input type="checkbox" value="culture" /><span>Culture & art</span>
+            </label>
+            <label class="check-pill">
+              <input type="checkbox" value="nature" /><span>Nature & viewpoints</span>
+            </label>
+            <label class="check-pill">
+              <input type="checkbox" value="nightlife" /><span>Nightlife & music</span>
+            </label>
+            <label class="check-pill">
+              <input type="checkbox" value="adventure" /><span>Adventure & hikes</span>
+            </label>
+            <label class="check-pill">
+              <input type="checkbox" value="budget" /><span>Budget spots</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- MOOD -->
+        <div class="field-group" style="margin-top:1rem;">
+          <label for="profileMood">What’s your usual mood?</label>
+          <p class="muted tiny">We’ll boost experiences that match your vibe.</p>
+
+          <select id="profileMood" class="select full-width">
+            <option value="any">Depends on the day</option>
+            <option value="chill">Chill & low-key</option>
+            <option value="social">Social & meetups</option>
+            <option value="adrenaline">Adrenaline & action</option>
+            <option value="budget">Budget-friendly</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-primary full-width" style="margin-top:1.4rem;">
+          Save & Continue
+        </button>
+      </form>
+
+      <p id="profileStatus" class="muted tiny" style="margin-top:0.8rem;min-height:1em;"></p>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>Your preferences are securely stored in Firebase</p>
+  </footer>
+
+  <!-- FIREBASE -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+  <!-- FIREBASE CONFIG -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA7qrQeypEYFhKCvQjM-5PaMaYpTFJZ-mk",
+      authDomain: "unseenrealm-b43d9.firebaseapp.com",
+      projectId: "unseenrealm-b43d9",
+      storageBucket: "unseenrealm-b43d9.firebasestorage.app",
+      messagingSenderId: "893669581410",
+      appId: "1:893669581410:web:ebfdbdeacc27dced73673b",
+      measurementId: "G-6PH9HCPP9K"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
+
+  <!-- APP LOGIC -->
+  <script src="app.js"></script>
+
+</body>
+</html>

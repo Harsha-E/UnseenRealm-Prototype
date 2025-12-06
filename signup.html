@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sign Up • UnseenRealm</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body class="theme-dark">
+
+  <!-- NAVBAR -->
+  <header class="nav">
+    <div class="logo">Unseen<span>Realm</span></div>
+    <nav id="navLinks"></nav>
+  </header>
+
+  <!-- SIGNUP SECTION -->
+  <main class="auth-page">
+    <section class="auth-card">
+
+      <h1>Create Your Account</h1>
+      <p class="text-muted tiny">
+        Personalize your recommendations & sync itineraries across devices.
+      </p>
+
+      <!-- SIGNUP FORM -->
+      <form id="signupForm" class="auth-form">
+
+        <div class="field">
+          <label for="suName">Your Name</label>
+          <input
+            id="suName"
+            type="text"
+            required
+            placeholder="Vizag Explorer"
+            autocomplete="name"
+          />
+        </div>
+
+        <div class="field">
+          <label for="suEmail">Email</label>
+          <input
+            id="suEmail"
+            type="email"
+            required
+            placeholder="you@example.com"
+            autocomplete="email"
+          />
+        </div>
+
+        <div class="field">
+          <label for="suPassword">Password</label>
+          <input
+            id="suPassword"
+            type="password"
+            required
+            placeholder="••••••••"
+            autocomplete="new-password"
+          />
+        </div>
+
+        <button type="submit" class="btn-primary full-width signup-btn">
+          Create Account
+        </button>
+      </form>
+
+      <!-- LOGIN LINK -->
+      <p class="auth-alt tiny">
+        Already have an account?
+        <a href="login.html" class="link-accent">Log in</a>
+      </p>
+
+      <!-- STATUS MESSAGE -->
+      <p id="signupStatus" class="auth-status tiny"></p>
+
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    Secure signup powered by Firebase Authentication
+  </footer>
+
+  <!-- FIREBASE -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA7qrQeypEYFhKCvQjM-5PaMaYpTFJZ-mk",
+      authDomain: "unseenrealm-b43d9.firebaseapp.com",
+      projectId: "unseenrealm-b43d9",
+      storageBucket: "unseenrealm-b43d9.firebasestorage.app",
+      messagingSenderId: "893669581410",
+      appId: "1:893669581410:web:ebfdbdeacc27dced73673b",
+      measurementId: "G-6PH9HCPP9K"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
+
+  <!-- APP LOGIC -->
+  <script src="app.js"></script>
+
+</body>
+</html>

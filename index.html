@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>UnseenRealm – Discover Hidden Experiences</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body class="theme-dark">
+  <!-- NAV -->
+  <header class="nav">
+    <div class="logo">Unseen<span>Realm</span></div>
+    <nav id="navLinks"></nav>
+  </header>
+
+  <!-- HERO -->
+  <main class="hero">
+    <section class="hero-text">
+      <h1>Unlock the <span>unseen realm</span> of every city.</h1>
+      <p>
+        AI-powered hidden experience discovery. Skip clichés and explore
+        underground food corners, secret rooftops, and local-only adventures
+        curated in real-time.
+      </p>
+
+      <div class="hero-actions">
+        <a href="explore.html" class="btn-primary">Start Exploring</a>
+        <a href="login.html" class="btn-ghost">Personalize with AI</a>
+      </div>
+    </section>
+
+    <section class="hero-visual">
+      <div class="glass-card">
+        <p class="pill">Tonight in your realm</p>
+        <h2>Hidden Rooftop Open Mic</h2>
+        <p class="muted">Live music • Street food • City view</p>
+      </div>
+
+      <div class="blur-orbit"></div>
+      <div class="blur-orbit second"></div>
+    </section>
+  </main>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <h2>Why UnseenRealm?</h2>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3>AI-Powered Discovery</h3>
+        <p>Smart suggestions based on your interests, preferences and mood.</p>
+      </div>
+
+      <div class="feature-card">
+        <h3>Map-First Experience</h3>
+        <p>See hidden gems visualized beautifully on a live interactive map grid.</p>
+      </div>
+
+      <div class="feature-card">
+        <h3>Local-Only Vibes</h3>
+        <p>Experiences recommended by locals — crafted, not marketed.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>Built by Ollivanders WizardOps · Powered by HTML · CSS · JS · Firebase</p>
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+  <!-- Firebase Config -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA7qrQeypEYFhKCvQjM-5PaMaYpTFJZ-mk",
+      authDomain: "unseenrealm-b43d9.firebaseapp.com",
+      projectId: "unseenrealm-b43d9",
+      storageBucket: "unseenrealm-b43d9.firebasestorage.app",
+      messagingSenderId: "893669581410",
+      appId: "1:893669581410:web:ebfdbdeacc27dced73673b",
+      measurementId: "G-6PH9HCPP9K"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
+
+  <!-- App Logic -->
+  <script src="app.js"></script>
+</body>
+</html>

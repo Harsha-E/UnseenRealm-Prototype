@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login • UnseenRealm</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body class="theme-dark">
+
+  <!-- NAVBAR -->
+  <header class="nav">
+    <div class="logo">Unseen<span>Realm</span></div>
+    <nav id="navLinks"></nav>
+  </header>
+
+  <!-- LOGIN WRAPPER -->
+  <main class="auth-page">
+    <section class="auth-card">
+
+      <h1>Welcome Back</h1>
+      <p class="text-muted tiny">Log in to access personalized experiences.</p>
+
+      <!-- LOGIN FORM -->
+      <form id="loginForm" class="auth-form">
+        
+        <div class="field">
+          <label for="loginEmail">Email</label>
+          <input 
+            id="loginEmail"
+            type="email"
+            required
+            placeholder="you@example.com"
+            autocomplete="email"
+          />
+        </div>
+
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <input
+            id="loginPassword"
+            type="password"
+            required
+            placeholder="••••••••"
+            autocomplete="current-password"
+          />
+        </div>
+
+        <button type="submit" class="btn-primary full-width login-btn">
+          Log In
+        </button>
+
+      </form>
+
+      <!-- SIGN UP LINK -->
+      <p class="auth-alt tiny">
+        New here?  
+        <a href="signup.html" class="link-accent">Create an account</a>
+      </p>
+
+      <!-- STATUS MESSAGE -->
+      <p id="loginStatus" class="auth-status tiny"></p>
+
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    Secure login powered by Firebase Authentication
+  </footer>
+
+  <!-- FIREBASE -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA7qrQeypEYFhKCvQjM-5PaMaYpTFJZ-mk",
+      authDomain: "unseenrealm-b43d9.firebaseapp.com",
+      projectId: "unseenrealm-b43d9",
+      storageBucket: "unseenrealm-b43d9.firebasestorage.app",
+      messagingSenderId: "893669581410",
+      appId: "1:893669581410:web:ebfdbdeacc27dced73673b",
+      measurementId: "G-6PH9HCPP9K"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
+
+  <script src="app.js"></script>
+
+</body>
+</html>
