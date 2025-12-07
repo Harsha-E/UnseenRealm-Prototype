@@ -21,13 +21,31 @@ body{background:#0b0014;color:#fff;overflow-x:hidden}
 }
 .logo{font-size:1.6rem;font-weight:800}
 .logo span{color:#ff00f5}
+#navLinks{display:flex;align-items:center;gap:1.5rem}
 #navLinks a{
- color:#fff;margin-left:1rem;text-decoration:none;font-size:.95rem;position:relative
+ color:#fff;text-decoration:none;font-size:.95rem;position:relative;
+ transition:.25s
 }
 #navLinks a::after{
  content:"";position:absolute;left:0;bottom:-3px;width:0;height:2px;background:#ff00f5;transition:.25s
 }
 #navLinks a:hover::after{width:100%}
+#navLinks a.active{color:#ff00f5}
+
+/* MOBILE MENU */
+.hamburger{display:none;flex-direction:column;cursor:pointer;gap:4px}
+.hamburger span{
+ width:25px;height:3px;background:#fff;border-radius:2px;transition:.3s
+}
+.hamburger.active span:nth-child(1){transform:rotate(45deg) translate(6px,6px)}
+.hamburger.active span:nth-child(2){opacity:0}
+.hamburger.active span:nth-child(3){transform:rotate(-45deg) translate(6px,-6px)}
+
+@media(max-width:768px){
+ .hamburger{display:flex}
+ #navLinks{display:none;flex-direction:column;position:absolute;top:100%;left:0;width:100%;background:rgba(0,0,0,.95);padding:1rem;text-align:center}
+ #navLinks.active{display:flex}
+}
 
 /* PAGE */
 .explore-page{padding-top:7rem;max-width:1400px;margin:auto}
@@ -93,6 +111,17 @@ body{background:#0b0014;color:#fff;overflow-x:hidden}
  background:linear-gradient(90deg,#ff00f5,#00e1ff);
  -webkit-background-clip:text;color:transparent
 }
+.exp-city,.exp-desc{font-size:.8rem;color:#ccc;margin:.2rem 0}
+
+/* MORE BUTTON */
+.more-btn{
+ width:100%;padding:1rem;border-radius:12px;
+ background:linear-gradient(90deg,#ff00f5,#00e1ff);
+ border:none;color:#fff;font-weight:600;font-size:1rem;
+ cursor:pointer;margin-top:1rem;transition:.2s
+}
+.more-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(255,0,245,.4)}
+
 /* HEART BUTTON */
 .like-btn{
  width:36px;height:36px;border-radius:50%;
@@ -125,12 +154,6 @@ body{background:#0b0014;color:#fff;overflow-x:hidden}
 .distance-label{
  background:rgba(0,0,0,.7);padding:.3rem .6rem;border-radius:6px;font-size:.7rem;color:#fff
 }
-.hover-label,.info-bubble{
- position:absolute;background:linear-gradient(90deg,#ff00f5,#00e1ff);
- color:#fff;padding:.45rem .8rem;border-radius:10px;font-size:.75rem;
- opacity:0;transition:.15s;pointer-events:none;z-index:300
-}
-.hover-label.show,.info-bubble.show{opacity:1}
 
 /* POPUP */
 #popupOverlay{
@@ -165,10 +188,18 @@ body{background:#0b0014;color:#fff;overflow-x:hidden}
 <!-- NAV -->
 <header class="nav">
   <div class="logo">Unseen<span>Realm</span></div>
+  
+  <div class="hamburger" id="hamburger">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  
   <nav id="navLinks">
-    <a href="index.html">Home</a>
-    <a href="profile.html">Profile</a>
-    <a href="itinerary.html">Itinerary</a>
+    <a href="index.html" data-page="home">Home</a>
+    <a href="profile.html" data-page="profile">Profile</a>
+    <a href="itinerary.html" data-page="itinerary" class="active">Itinerary</a>
+    <a href="explore.html" data-page="explore">Explore</a>
   </nav>
 </header>
 
@@ -266,6 +297,7 @@ body{background:#0b0014;color:#fff;overflow-x:hidden}
       <h2>Suggestions</h2>
       <p id="resultsCount" style="color:#aaa;font-size:.85rem;margin-bottom:1rem">Loading...</p>
       <div id="experienceList"></div>
+      <button id="moreBtn" class="more-btn" style="display:none">Load More Suggestions →</button>
     </div>
   </section>
 
@@ -286,10 +318,38 @@ firebase.initializeApp({
 const auth=firebase.auth();
 const db=firebase.firestore();
 
+/* NAVBAR FUNCTIONALITY */
+const hamburger = document.getElementById('hamburger');
+const navLinks = document.getElementById('navLinks');
+
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('active');
+  navLinks.classList.toggle('active');
+});
+
+// Close mobile menu when clicking a link
+document.querySelectorAll('#navLinks a').forEach(link => {
+  link.addEventListener('click', () => {
+    hamburger.classList.remove('active');
+    navLinks.classList.remove('active');
+    
+    // Set active page
+    document.querySelectorAll('#navLinks a').forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+  });
+});
+
+// Set current page active (Explore page)
+document.querySelector('a[data-page="explore"]').classList.add('active');
+
 /* STATE */
 let currentInterest="all";
 let currentMood="any";
 let userLocation=[83.375183,17.7774363];
+let allFilteredExperiences = [];
+let visibleExperiences = [];
+let showCount = 0;
+const ITEMS_PER_PAGE = 5;
 
 /* EXPERIENCES DATA */
 const experiences=[
@@ -307,92 +367,16 @@ const experiences=[
  {id:202,title:"Yendada Cliff Micro-Edge",city:"Vizag",description:"Wind corridor spot.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"calm",mapX:83.37572,mapY:17.77655},
  {id:203,title:"IT Hills Frame View",city:"Vizag",description:"Gap rooftop frame.",interest:"culture",mood:"social",rating:4,budget:"free",crowd:"medium",mapX:83.37641,mapY:17.77702},
  {id:204,title:"Curve Forest Pocket",city:"Vizag",description:"Silent forest scent.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"calm",mapX:83.37395,mapY:17.77783},
- {id:320,title:"Kasol Riverside Calm Patch",city:"Himachal",description:"Deep pine calm zone.",interest:"nature",mood:"chill",rating:5,budget:"mid",crowd:"medium",mapX:77.3210,mapY:32.0099},
- /* ---------------------- 100 EXPERIENCES NEAR GVP RUSHIKONDA (20 KM) ---------------------- */
-
-/* ---------------------- RUSHIKONDA → CORE CLUSTER ---------------------- */
-{id:700,title:"Rushikonda Sunrise Rock Shelf",city:"Rushikonda",description:"Best early morning rock platform with crashing waves.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"calm",mapX:83.38012,mapY:17.80921},
-{id:701,title:"Rushikonda Cliff Bowl",city:"Rushikonda",description:"Circular cliff dip with strong wind echo.",interest:"adventure",mood:"adrenaline",rating:5,budget:"free",crowd:"medium",mapX:83.38152,mapY:17.81312},
-{id:702,title:"GVP Back Gate Trail Start",city:"Rushikonda",description:"Secret forest-like trail starting behind GVP.",interest:"adventure",mood:"chill",rating:4,budget:"free",crowd:"calm",mapX:83.36912,mapY:17.81872},
-{id:703,title:"GVP Rooftop Night Wind Spot",city:"Rushikonda",description:"Popular student nightly hangout for breeze.",interest:"nightlife",mood:"social",rating:4,budget:"free",crowd:"medium",mapX:83.37081,mapY:17.82092},
-{id:704,title:"GVP Staff Road Sitout",city:"Rushikonda",description:"Quiet bench-style sitout area beside staff quarters.",interest:"nature",mood:"chill",rating:4,budget:"free",crowd:"low",mapX:83.36975,mapY:17.82152},
-{id:705,title:"Rushikonda Hidden Coconut Patch",city:"Rushikonda",description:"Green patch with natural canopy shades.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"calm",mapX:83.37972,mapY:17.80733},
-{id:706,title:"Rushikonda Sunset Curve",city:"Rushikonda",description:"Famous curve with orange-pink horizon views.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"medium",mapX:83.37741,mapY:17.81752},
-{id:707,title:"GVP Boys Hostel Terrace Peak",city:"Rushikonda",description:"Panoramic city-cum-sea view.",interest:"nightlife",mood:"chill",rating:5,budget:"free",crowd:"low",mapX:83.36902,mapY:17.81988},
-{id:708,title:"GVP Sports Ground Breezeline",city:"Rushikonda",description:"Perfect wind corridor after 6pm.",interest:"nature",mood:"social",rating:4,budget:"free",crowd:"medium",mapX:83.37133,mapY:17.81808},
-{id:709,title:"Rushikonda Hidden Sea Steps",city:"Rushikonda",description:"Old stone formation leading close to waves.",interest:"adventure",mood:"adrenaline",rating:5,budget:"free",crowd:"low",mapX:83.37994,mapY:17.81088},
-
-/* ---------------------- RUSHIKONDA FOOD CLUSTER ---------------------- */
-{id:710,title:"Rushi Maggi Corner",city:"Rushikonda",description:"Student favourite hot Maggi spot.",interest:"food",mood:"budget",rating:4,budget:"low",crowd:"busy",mapX:83.37152,mapY:17.82142},
-{id:711,title:"Rushi Beach Road Fries Shop",city:"Rushikonda",description:"Midnight fries with beach-side wind.",interest:"food",mood:"nightlife",rating:4,budget:"low",crowd:"busy",mapX:83.37282,mapY:17.82091},
-{id:712,title:"Rushikonda Coconut Water Strip",city:"Rushikonda",description:"Refreshing break along shore road.",interest:"food",mood:"chill",rating:4,budget:"low",crowd:"medium",mapX:83.37452,mapY:17.81662},
-{id:713,title:"GVP Campus Chai Circle",city:"Rushikonda",description:"Late-night student meet hub.",interest:"food",mood:"social",rating:4,budget:"low",crowd:"busy",mapX:83.37065,mapY:17.82288},
-{id:714,title:"Mini Tiffins by GVP Turn",city:"Rushikonda",description:"Best budget idli-dosa patch.",interest:"food",mood:"budget",rating:5,budget:"low",crowd:"medium",mapX:83.37113,mapY:17.82333},
-
-/* ---------------------- YENDADA / IT HILLS CLUSTER ---------------------- */
-{id:720,title:"Yendada Top Ridge Windline",city:"Yendada",description:"Wind hits strongest at this top ridge.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"calm",mapX:83.37403,mapY:17.77962},
-{id:721,title:"IT Hills Night Balcony Spot",city:"Yendada",description:"Balcony-like cliff with skyline lights.",interest:"nightlife",mood:"social",rating:5,budget:"free",crowd:"medium",mapX:83.37692,mapY:17.77721},
-{id:722,title:"Yendada Secret Tunnel Lane",city:"Yendada",description:"Narrow lane between cliffs, perfect photo spot.",interest:"culture",mood:"social",rating:4,budget:"free",crowd:"low",mapX:83.37583,mapY:17.77618},
-{id:723,title:"Yendada Valley Sitout",city:"Yendada",description:"Lower valley gives mountain-like feel.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"calm",mapX:83.37452,mapY:17.77803},
-{id:724,title:"IT Hills Tech Adda Road",city:"Yendada",description:"Popular for night drives + coffee.",interest:"nightlife",mood:"social",rating:4,budget:"free",crowd:"medium",mapX:83.37712,mapY:17.77772},
-{id:725,title:"Yendada Forest Edge",city:"Yendada",description:"End of road with lush green backdrop.",interest:"adventure",mood:"adrenaline",rating:4,budget:"free",crowd:"low",mapX:83.37392,mapY:17.78028},
-
-/* ---------------------- SAGAR NAGAR CLUSTER ---------------------- */
-{id:740,title:"Sagar Nagar Upper Cliff",city:"Vizag",description:"Lightly visited cliff with sea arc view.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"low",mapX:83.3525,mapY:17.7562},
-{id:741,title:"Sagar Nagar Arch Rock",city:"Vizag",description:"Rare rock arch seen during low tide.",interest:"adventure",mood:"adrenaline",rating:5,budget:"free",crowd:"medium",mapX:83.3494,mapY:17.7531},
-{id:742,title:"Sagar Nagar Sea Street",city:"Vizag",description:"Cool breeze + evening chai.",interest:"food",mood:"chill",rating:4,budget:"low",crowd:"medium",mapX:83.3534,mapY:17.7547},
-{id:743,title:"Sagar Nagar Fishing Edge",city:"Vizag",description:"Quiet fishing zone at mornings.",interest:"nature",mood:"chill",rating:4,budget:"free",crowd:"low",mapX:83.3509,mapY:17.7522},
-
-/* ---------------------- MVP COLONY CLUSTER ---------------------- */
-{id:760,title:"MVP Double Road Breeze Spot",city:"Vizag",description:"Strong wind corridor, photogenic at dusk.",interest:"nature",mood:"chill",rating:4,budget:"free",crowd:"medium",mapX:83.33012,mapY:17.74431},
-{id:761,title:"MVP Subway Art Steps",city:"Vizag",description:"Colourful graffiti steps.",interest:"culture",mood:"social",rating:4,budget:"free",crowd:"medium",mapX:83.32982,mapY:17.74272},
-{id:762,title:"MVP Park Bench Lane",city:"Vizag",description:"Tree-lined walkway ideal for evening relaxation.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"calm",mapX:83.3321,mapY:17.7459},
-
-/* ---------------------- TENNETI PARK CLUSTER ---------------------- */
-{id:780,title:"Tenneti Cliff Descent Trail",city:"Vizag",description:"Steep hidden access down from the park.",interest:"adventure",mood:"adrenaline",rating:5,budget:"free",crowd:"medium",mapX:83.3402,mapY:17.7421},
-{id:781,title:"Tenneti Sea Bench View",city:"Vizag",description:"One of the most peaceful benches facing the sea.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"low",mapX:83.3411,mapY:17.7431},
-
-/* ---------------------- ARILOVA / ZOO AREA ---------------------- */
-{id:790,title:"Arilova Temple Steps",city:"Vizag",description:"Quiet + green with stone steps.",interest:"culture",mood:"chill",rating:4,budget:"free",crowd:"calm",mapX:83.3162,mapY:17.7702},
-{id:791,title:"Zoo Backroad Forest Smell Strip",city:"Vizag",description:"Strong eucalyptus scent patch.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"low",mapX:83.3175,mapY:17.7611},
-{id:792,title:"Arilova Small Hilltop",city:"Vizag",description:"City skyline from a low-height hill.",interest:"adventure",mood:"adrenaline",rating:4,budget:"free",crowd:"low",mapX:83.3193,mapY:17.7639},
-
-/* ---------------------- BHEEMILI ROAD / NEAR 20 KM ---------------------- */
-{id:820,title:"Bheemili View Curve 1",city:"Vizag",description:"Empty curve overlooking long coastline.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"low",mapX:83.4251,mapY:17.8892},
-{id:821,title:"Bheemili Sand Patch South",city:"Vizag",description:"Clean sand rarely visited.",interest:"nature",mood:"chill",rating:4,budget:"free",crowd:"low",mapX:83.4282,mapY:17.8851},
-{id:822,title:"Bheemili Hill Step Road",city:"Vizag",description:"Steep zigzag road with top view.",interest:"adventure",mood:"adrenaline",rating:5,budget:"free",crowd:"medium",mapX:83.4221,mapY:17.8936},
-
-/* ---------------------- EXTRA DENSE CLUSTER NEAR GVP ---------------------- */
-{id:850,title:"GVP East Lane Chill Zone",city:"Rushikonda",description:"Calm quiet lane perfect for long talks.",interest:"nature",mood:"chill",rating:4,budget:"free",crowd:"low",mapX:83.37171,mapY:17.82198},
-{id:851,title:"GVP North Sitout Rock",city:"Rushikonda",description:"Rock patch behind north block.",interest:"adventure",mood:"chill",rating:5,budget:"free",crowd:"low",mapX:83.37199,mapY:17.81934},
-{id:852,title:"GVP Evening Walk Strip",city:"Rushikonda",description:"Popular walk lane used by students daily.",interest:"nature",mood:"social",rating:4,budget:"free",crowd:"medium",mapX:83.37023,mapY:17.82012},
-{id:853,title:"GVP Secret Backbench",city:"Rushikonda",description:"Hidden bench under a neem tree.",interest:"nature",mood:"calm",rating:5,budget:"free",crowd:"low",mapX:83.37101,mapY:17.81981},
-{id:854,title:"Rushi Old Lighthouse Foundation",city:"Rushikonda",description:"Broken stone base with history.",interest:"culture",mood:"chill",rating:4,budget:"free",crowd:"low",mapX:83.37851,mapY:17.80881},
-
-/* ---------------------- UP TO 100 ENTRIES ---------------------- */
-{id:855,title:"Rushikonda Sea Bridge Corner",city:"Rushikonda",description:"Secluded edge near the bridge.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"low",mapX:83.37588,mapY:17.81352},
-{id:856,title:"Rushikonda College Bend Hangout",city:"Rushikonda",description:"Most-used spot by GVP students.",interest:"nightlife",mood:"social",rating:4,budget:"low",crowd:"busy",mapX:83.37271,mapY:17.82218},
-{id:857,title:"Yendada West Hill Steps",city:"Yendada",description:"Small stone steps leading to a silent cliff.",interest:"adventure",mood:"chill",rating:5,budget:"free",crowd:"low",mapX:83.37202,mapY:17.77981},
-{id:858,title:"Yendada Overlook Bench",city:"Yendada",description:"Single bench facing the mountain skyline.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"calm",mapX:83.37528,mapY:17.77801},
-{id:859,title:"IT Hills Food Cluster Spot",city:"Yendada",description:"Paneer rolls + shawarma + live crowd.",interest:"food",mood:"nightlife",rating:5,budget:"low",crowd:"busy",mapX:83.37655,mapY:17.77759},
-
-{id:860,title:"Rushikonda Palm Tree Stretch",city:"Rushikonda",description:"Feels like Bali. Perfect for photos.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"medium",mapX:83.38099,mapY:17.80651},
-{id:861,title:"Rushikonda View Ridge Twin Peaks",city:"Rushikonda",description:"Two-peak point giving 270° panorama.",interest:"adventure",mood:"adrenaline",rating:5,budget:"free",crowd:"low",mapX:83.38277,mapY:17.81592},
-{id:862,title:"Rushikonda Cove Hidden Patch",city:"Rushikonda",description:"Tiny curved cove accessible only by trail.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"low",mapX:83.38125,mapY:17.80772},
-
-{id:863,title:"Madhurawada Metro Curve",city:"Madhurawada",description:"Brilliant night lights from metro pillars.",interest:"nightlife",mood:"social",rating:4,budget:"free",crowd:"medium",mapX:83.40011,mapY:17.82881},
-{id:864,title:"Madhurawada Food Street Lite",city:"Madhurawada",description:"Budget food heaven, extremely active.",interest:"food",mood:"nightlife",rating:5,budget:"low",crowd:"busy",mapX:83.40272,mapY:17.82671},
-
-{id:865,title:"Rushi Z-Bend High Point",city:"Rushikonda",description:"Sharp Z-bend on hill with surreal view.",interest:"adventure",mood:"adrenaline",rating:5,budget:"free",crowd:"medium",mapX:83.38111,mapY:17.81332},
-{id:866,title:"GVP Hidden Forest Pocket 2",city:"Rushikonda",description:"Another secret forest-like hideout.",interest:"nature",mood:"chill",rating:4,budget:"free",crowd:"low",mapX:83.37092,mapY:17.81972},
-
-{id:867,title:"Beach Road Milkyway Spot",city:"Vizag",description:"Dark sky patch where stars are clearer.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"low",mapX:83.33381,mapY:17.73621},
-{id:868,title:"Yendada Lovers Corner Ridge",city:"Yendada",description:"Quiet and private ridge corner.",interest:"nature",mood:"social",rating:4,budget:"free",crowd:"low",mapX:83.37512,mapY:17.77742},
-{id:869,title:"Rushikonda Shallow Pool Rocks",city:"Rushikonda",description:"Tide pools forming tiny natural aquariums.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"medium",mapX:83.38052,mapY:17.80942},
-
-{id:870,title:"Bheemili Lighthouse Base Patch",city:"Bheemili",description:"Historic lighthouse backdrop.",interest:"culture",mood:"chill",rating:5,budget:"free",crowd:"low",mapX:83.44012,mapY:17.89161},
-
-
+ {id:700,title:"Rushikonda Sunrise Rock Shelf",city:"Rushikonda",description:"Best early morning rock platform with crashing waves.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"calm",mapX:83.38012,mapY:17.80921},
+ {id:701,title:"Rushikonda Cliff Bowl",city:"Rushikonda",description:"Circular cliff dip with strong wind echo.",interest:"adventure",mood:"adrenaline",rating:5,budget:"free",crowd:"medium",mapX:83.38152,mapY:17.81312},
+ {id:702,title:"GVP Back Gate Trail Start",city:"Rushikonda",description:"Secret forest-like trail starting behind GVP.",interest:"adventure",mood:"chill",rating:4,budget:"free",crowd:"calm",mapX:83.36912,mapY:17.81872},
+ {id:710,title:"Rushi Maggi Corner",city:"Rushikonda",description:"Student favourite hot Maggi spot.",interest:"food",mood:"budget",rating:4,budget:"low",crowd:"busy",mapX:83.37152,mapY:17.82142},
+ {id:720,title:"Yendada Top Ridge Windline",city:"Yendada",description:"Wind hits strongest at this top ridge.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"calm",mapX:83.37403,mapY:17.77962},
+ {id:721,title:"IT Hills Night Balcony Spot",city:"Yendada",description:"Balcony-like cliff with skyline lights.",interest:"nightlife",mood:"social",rating:5,budget:"free",crowd:"medium",mapX:83.37692,mapY:17.77721},
+ {id:740,title:"Sagar Nagar Upper Cliff",city:"Vizag",description:"Lightly visited cliff with sea arc view.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"low",mapX:83.3525,mapY:17.7562},
+ {id:780,title:"Tenneti Cliff Descent Trail",city:"Vizag",description:"Steep hidden access down from the park.",interest:"adventure",mood:"adrenaline",rating:5,budget:"free",crowd:"medium",mapX:83.3402,mapY:17.7421},
+ {id:850,title:"GVP East Lane Chill Zone",city:"Rushikonda",description:"Calm quiet lane perfect for long talks.",interest:"nature",mood:"chill",rating:4,budget:"free",crowd:"low",mapX:83.37171,mapY:17.82198},
+ {id:860,title:"Rushikonda Palm Tree Stretch",city:"Rushikonda",description:"Feels like Bali. Perfect for photos.",interest:"nature",mood:"chill",rating:5,budget:"free",crowd:"medium",mapX:83.38099,mapY:17.80651}
 ];
 
 /* HAVERSINE */
@@ -403,20 +387,29 @@ function hav(a,b,c,d){
 }
 
 /* MAP INIT */
-let map3d=new maplibregl.Map({
- container:"map3d",
- style:{
-  version:8,
-  sources:{sat:{type:"raster",tiles:[
-   "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-  ],tileSize:256}},
-  layers:[{id:"sat",type:"raster",source:"sat"}]
- },
- center:userLocation,zoom:13,pitch:55,bearing:-17
-});
-
-/* USER MARKER */
+let map3d;
+let markers=[];
 let userMarker;
+
+function initMap(){
+ map3d=new maplibregl.Map({
+  container:"map3d",
+  style:{
+   version:8,
+   sources:{sat:{type:"raster",tiles:[
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+   ],tileSize:256}},
+   layers:[{id:"sat",type:"raster",source:"sat"}]
+  },
+  center:userLocation,zoom:13,pitch:55,bearing:-17
+ });
+
+ map3d.on('load', ()=>{
+  placeUserMarker();
+  update();
+ });
+}
+
 function placeUserMarker(){
  if(userMarker) userMarker.remove();
  let pin=document.createElement("div");
@@ -426,21 +419,11 @@ function placeUserMarker(){
  pin.appendChild(ring);
  userMarker=new maplibregl.Marker({element:pin}).setLngLat(userLocation).addTo(map3d);
 }
-placeUserMarker();
-
-/* MARKERS */
-let markers=[];
-let hoverLabel=document.createElement("div");
-let infoBubble=document.createElement("div");
-hoverLabel.className="hover-label";
-infoBubble.className="info-bubble";
-document.body.appendChild(hoverLabel);
-document.body.appendChild(infoBubble);
 
 function addMarkers(arr){
  markers.forEach(m=>m.remove());
  markers=[];
- arr.forEach(e=>{
+ arr.slice(0, Math.min(10, arr.length)).forEach(e=>{
   let dot=document.createElement("div");
   let col=e.mood==="chill"?"#00e1ff":e.mood==="adrenaline"?"#ff006a":e.mood==="social"?"#ff00f5":"#fff";
   dot.style.cssText=`width:14px;height:14px;border-radius:50%;background:${col};box-shadow:0 0 12px ${col}`;
@@ -448,33 +431,18 @@ function addMarkers(arr){
   markers.push(m1);
 
   let d=hav(userLocation[1],userLocation[0],e.mapY,e.mapX).toFixed(1);
-
   dot.onclick=()=>openPopup(e,d);
-
-  dot.onmouseenter=ev=>{
-   hoverLabel.innerHTML=`${e.title} • ${d} km`;
-   hoverLabel.style.left=ev.clientX+"px";
-   hoverLabel.style.top=(ev.clientY-26)+"px";
-   hoverLabel.classList.add("show");
-  };
-  dot.onmousemove=ev=>{
-   hoverLabel.style.left=ev.clientX+"px";
-   hoverLabel.style.top=(ev.clientY-26)+"px";
-  };
-  dot.onmouseleave=()=>hoverLabel.classList.remove("show");
-
-  let lbl=document.createElement("div");
-  lbl.className="distance-label";
-  lbl.innerText=`${d} km`;
-  let m2=new maplibregl.Marker({element:lbl,anchor:"bottom"}).setLngLat([e.mapX,e.mapY]).addTo(map3d);
-  markers.push(m2);
-
-  lbl.onclick=()=>openPopup(e,d);
  });
 }
 
 /* POPUP */
 let selectedPopupItem=null;
+const popupTitle=document.getElementById("popupTitle");
+const popupSub=document.getElementById("popupSub");
+const popupNavBtn=document.getElementById("popupNavBtn");
+const popupOverlay=document.getElementById("popupOverlay");
+const popupBox=document.getElementById("popupBox");
+const popupClose=document.getElementById("popupClose");
 
 function openPopup(data,d){
  selectedPopupItem=data;
@@ -506,14 +474,12 @@ async function saveToItinerary(item){
  alert("Added to your itinerary ✔");
 }
 
-popupSaveBtn.onclick=()=>{ if(selectedPopupItem) saveToItinerary(selectedPopupItem); };
-
 /* FILTER */
 function filterExperiences(){
- let r=parseInt(ratingFilter.value);
- let b=budgetFilter.value;
- let c=crowdFilter.value;
- let dist=parseInt(distanceFilter.value);
+ let r=parseInt(document.getElementById("ratingFilter").value);
+ let b=document.getElementById("budgetFilter").value;
+ let c=document.getElementById("crowdFilter").value;
+ let dist=parseInt(document.getElementById("distanceFilter").value);
  let maxD=dist===20 ? 99999 : dist;
 
  return experiences.filter(e=>{
@@ -524,13 +490,24 @@ function filterExperiences(){
  });
 }
 
-function renderList(arr){
- let box=document.getElementById("experienceList");
- box.innerHTML="";
- arr.forEach(e=>{
+/* RENDER LIST */
+function renderList(){
+ const listBox=document.getElementById("experienceList");
+ const moreBtn=document.getElementById("moreBtn");
+ const resultsCount=document.getElementById("resultsCount");
+ 
+ if(visibleExperiences.length === 0){
+  listBox.innerHTML='<div style="text-align:center;padding:2rem;color:#aaa">No experiences found</div>';
+  moreBtn.style.display="none";
+  resultsCount.innerText="0 results";
+  return;
+ }
+
+ listBox.innerHTML="";
+ visibleExperiences.slice(0, showCount).forEach(e=>{
   let d=hav(userLocation[1],userLocation[0],e.mapY,e.mapX).toFixed(1);
-  box.innerHTML+=`
-   <div class="exp-card">
+  listBox.innerHTML+=`
+   <div class="exp-card" onclick="openPopup(${JSON.stringify(e).replace(/"/g, '&quot;')},${d})">
      <div>
        <div class="exp-title">${e.title}</div>
        <div class="exp-city">${e.city} • ${d} km</div>
@@ -544,54 +521,71 @@ function renderList(arr){
    </div>`;
  });
 
- resultsCount.innerText=`${arr.length} results`;
+ resultsCount.innerText=`${allFilteredExperiences.length} results (${Math.min(showCount, allFilteredExperiences.length)}/${allFilteredExperiences.length})`;
+ moreBtn.style.display= showCount < allFilteredExperiences.length ? "block" : "none";
+ 
+ // Bind heart buttons
+ setTimeout(()=>{
+  document.querySelectorAll("[data-heart]").forEach(btn=>{
+   btn.onclick=(ev)=>{
+    ev.stopPropagation();
+    const id=parseInt(btn.dataset.heart);
+    const item=experiences.find(x=>x.id===id);
+    if(item) saveToItinerary(item);
+    btn.classList.add("saved");
+   };
+  });
+ }, 100);
 }
 
 /* UPDATE */
 function update(){
- let f=filterExperiences();
- renderList(f);
- addMarkers(f);
-
- document.querySelectorAll("[data-heart]").forEach(btn=>{
-  btn.onclick=()=>{
-   const id=parseInt(btn.dataset.heart);
-   const item=experiences.find(x=>x.id===id);
-   saveToItinerary(item);
-   btn.classList.add("saved");
-  };
- });
+ allFilteredExperiences = filterExperiences();
+ showCount = ITEMS_PER_PAGE;
+ visibleExperiences = allFilteredExperiences;
+ if(map3d && map3d.isStyleLoaded()){
+  renderList();
+  addMarkers(visibleExperiences);
+ }
 }
 
-/* CLICK EVENTS */
-document.querySelectorAll(".chip").forEach(btn=>{
- btn.onclick=()=>{
-  document.querySelectorAll(".chip").forEach(c=>c.classList.remove("chip-active"));
-  btn.classList.add("chip-active");
-  currentInterest=btn.dataset.interest;
-  update();
- };
-});
-
-document.querySelectorAll(".mood-chip").forEach(m=>{
- m.onclick=()=>{
-  document.querySelectorAll(".mood-chip").forEach(x=>x.classList.remove("active"));
-  m.classList.add("active");
-  currentMood=m.dataset.mood;
-  update();
- };
-});
-
-ratingFilter.oninput=e=>ratingValue.innerHTML=`★ ${e.target.value}+`;
-distanceFilter.oninput=e=>{
- let v=parseInt(e.target.value);
- distanceValue.innerHTML=v===20 ? "20+ km" : `Within ${v} km`;
+/* LOAD MORE */
+document.getElementById("moreBtn").onclick=()=>{
+ showCount += ITEMS_PER_PAGE;
+ renderList();
 };
 
-openFilters.onclick=()=>filterPanel.classList.toggle("open");
-applyFilters.onclick=()=>{filterPanel.classList.remove("open");update()};
+/* CLICK EVENTS */
+document.addEventListener("click", (e)=>{
+ if(e.target.dataset.interest){
+  document.querySelectorAll(".chip").forEach(c=>c.classList.remove("chip-active"));
+  e.target.classList.add("chip-active");
+  currentInterest=e.target.dataset.interest;
+  update();
+ }
+ 
+ if(e.target.dataset.mood !== undefined){
+  document.querySelectorAll(".mood-chip").forEach(x=>x.classList.remove("active"));
+  e.target.classList.add("active");
+  currentMood=e.target.dataset.mood;
+  update();
+ }
+});
 
-update();
+document.getElementById("ratingFilter").oninput=e=>document.getElementById("ratingValue").innerHTML=`★ ${e.target.value}+`;
+document.getElementById("distanceFilter").oninput=e=>{
+ let v=parseInt(e.target.value);
+ document.getElementById("distanceValue").innerHTML=v===20 ? "20+ km" : `Within ${v} km`;
+};
+
+document.getElementById("openFilters").onclick=()=>document.getElementById("filterPanel").classList.toggle("open");
+document.getElementById("applyFilters").onclick=()=>{
+ document.getElementById("filterPanel").classList.remove("open");
+ update();
+};
+
+// Initialize map when DOM is ready
+document.addEventListener('DOMContentLoaded', initMap);
 </script>
 
 </body>
