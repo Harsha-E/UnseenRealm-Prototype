@@ -1,98 +1,208 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Login • UnseenRealm</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Login • UnseenRealm</title>
 
-  <link rel="stylesheet" href="styles.css" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
+body{
+ background:#070011;color:#fff;overflow-x:hidden;height:100vh;
+ position:relative;display:flex;flex-direction:column;justify-content:center;
+}
+
+/* BACKGROUND GLOW */
+body::before,body::after{
+ content:"";position:fixed;inset:0;z-index:-2;
+ background:radial-gradient(circle at 20% 20%,#ff00f540,transparent 45%),
+            radial-gradient(circle at 80% 80%,#00e1ff40,transparent 50%);
+}
+body::after{
+ background:radial-gradient(circle,#ff00f550,transparent 60%);
+ mix-blend-mode:screen;filter:blur(140px);animation:glowMove 9s infinite alternate;
+}
+@keyframes glowMove{
+ 0%{opacity:.45;transform:scale(1)}
+ 100%{opacity:.9;transform:scale(1.2)}
+}
+
+/* NAVBAR */
+.nav{
+ position:fixed;top:0;left:0;width:100%;padding:1rem 2rem;
+ display:flex;justify-content:space-between;align-items:center;
+ background:rgba(0,0,0,.25);backdrop-filter:blur(14px);z-index:50
+}
+.logo{font-size:1.75rem;font-weight:800}
+.logo span{color:#ff00f5}
+
+/* AUTH WRAPPER */
+.auth-page{
+ display:flex;justify-content:center;align-items:center;
+ padding-top:5rem;padding-bottom:2rem;min-height:100vh;
+}
+
+/* CARD */
+.auth-card{
+ width:92%;max-width:380px;background:rgba(255,255,255,.07);
+ border:1px solid rgba(255,255,255,.15);
+ padding:2.1rem 1.8rem;border-radius:22px;
+ backdrop-filter:blur(22px);
+ box-shadow:0 0 30px rgba(255,0,245,.25);
+ animation:fadeUp .6s ease;
+}
+@keyframes fadeUp{
+ from{transform:translateY(45px);opacity:0}
+ to{transform:translateY(0);opacity:1}
+}
+
+.auth-card h1{
+ font-size:2rem;font-weight:800;
+ background:linear-gradient(90deg,#ff00f5,#00e1ff);
+ -webkit-background-clip:text;color:transparent;margin-bottom:.4rem
+}
+.text-muted{color:#ccc;font-size:.9rem;margin-bottom:1.3rem}
+
+/* INPUT FIELD */
+.field{margin-bottom:1.15rem;display:flex;flex-direction:column}
+.field label{font-size:.9rem;color:#bbb;margin-bottom:.35rem}
+.field input{
+ padding:.9rem 1rem;border-radius:12px;
+ background:rgba(255,255,255,.08);
+ border:1px solid rgba(255,255,255,.2);color:#fff;font-size:.95rem;
+ transition:.25s;
+}
+.field input:focus{
+ border-color:#ff00f5;outline:none;
+ box-shadow:0 0 16px #ff00f580
+}
+
+/* BUTTON */
+.btn-primary{
+ width:100%;padding:.95rem;border-radius:12px;border:none;cursor:pointer;
+ background:linear-gradient(90deg,#ff00f5,#00e1ff);
+ color:#fff;font-weight:700;font-size:1.05rem;margin-top:.2rem;
+ transition:.25s;
+}
+.btn-primary:hover{
+ transform:scale(1.03);
+ box-shadow:0 0 22px rgba(255,0,245,.45)
+}
+.btn-primary:active{transform:scale(.97)}
+
+/* ALT */
+.auth-alt{text-align:center;margin-top:1rem;color:#bbb;font-size:.85rem}
+.link-accent{color:#00e1ff;text-decoration:none}
+.link-accent:hover{text-decoration:underline}
+
+/* STATUS */
+.auth-status{
+ margin-top:.9rem;text-align:center;font-size:.83rem;
+ min-height:1.2rem;color:#ff7ccc;
+}
+
+/* FOOTER */
+.footer{
+ text-align:center;padding:1rem 0;font-size:.78rem;color:#888;
+ backdrop-filter:blur(8px);margin-top:auto;
+}
+
+@media(max-width:450px){
+ .auth-card{padding:1.7rem 1.4rem}
+}
+</style>
 </head>
 
-<body class="theme-dark">
+<body>
 
-  <!-- NAVBAR -->
-  <header class="nav">
-    <div class="logo">Unseen<span>Realm</span></div>
-    <nav id="navLinks"></nav>
-  </header>
+<!-- NAVBAR -->
+<header class="nav">
+  <div class="logo">Unseen<span>Realm</span></div>
+  <nav>
+    <a href="index.html" style="color:#fff;text-decoration:none;font-size:.9rem;">Home</a>
+  </nav>
+</header>
 
-  <!-- LOGIN WRAPPER -->
-  <main class="auth-page">
-    <section class="auth-card">
+<!-- LOGIN FORM -->
+<main class="auth-page">
+  <section class="auth-card">
 
-      <h1>Welcome Back</h1>
-      <p class="text-muted tiny">Log in to access personalized experiences.</p>
+    <h1>Welcome Back</h1>
+    <p class="text-muted">Log in to continue your journey.</p>
 
-      <!-- LOGIN FORM -->
-      <form id="loginForm" class="auth-form">
-        
-        <div class="field">
-          <label for="loginEmail">Email</label>
-          <input 
-            id="loginEmail"
-            type="email"
-            required
-            placeholder="you@example.com"
-            autocomplete="email"
-          />
-        </div>
+    <form id="loginForm">
+      <div class="field">
+        <label>Email</label>
+        <input id="loginEmail" type="email" required placeholder="you@example.com">
+      </div>
 
-        <div class="field">
-          <label for="loginPassword">Password</label>
-          <input
-            id="loginPassword"
-            type="password"
-            required
-            placeholder="••••••••"
-            autocomplete="current-password"
-          />
-        </div>
+      <div class="field">
+        <label>Password</label>
+        <input id="loginPassword" type="password" required placeholder="••••••••">
+      </div>
 
-        <button type="submit" class="btn-primary full-width login-btn">
-          Log In
-        </button>
+      <button type="submit" class="btn-primary">Log In</button>
+    </form>
 
-      </form>
+    <p class="auth-alt">
+      New here?
+      <a href="signup.html" class="link-accent">Create an account</a>
+    </p>
 
-      <!-- SIGN UP LINK -->
-      <p class="auth-alt tiny">
-        New here?  
-        <a href="signup.html" class="link-accent">Create an account</a>
-      </p>
+    <p id="loginStatus" class="auth-status"></p>
 
-      <!-- STATUS MESSAGE -->
-      <p id="loginStatus" class="auth-status tiny"></p>
+  </section>
+</main>
 
-    </section>
-  </main>
+<footer class="footer">Secure login powered by Firebase Authentication</footer>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    Secure login powered by Firebase Authentication
-  </footer>
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
-  <!-- FIREBASE -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script>
+/* ---------------- FIREBASE INIT ---------------- */
+const firebaseConfig={
+ apiKey:"AIzaSyA7qrQeypEYFhKCvQjM-5PaMaYpTFJZ-mk",
+ authDomain:"unseenrealm-b43d9.firebaseapp.com",
+ projectId:"unseenrealm-b43d9",
+ storageBucket:"unseenrealm-b43d9.firebasestorage.app",
+ messagingSenderId:"893669581410",
+ appId:"1:893669581410:web:ebfdbdeacc27dced73673b"
+};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyA7qrQeypEYFhKCvQjM-5PaMaYpTFJZ-mk",
-      authDomain: "unseenrealm-b43d9.firebaseapp.com",
-      projectId: "unseenrealm-b43d9",
-      storageBucket: "unseenrealm-b43d9.firebasestorage.app",
-      messagingSenderId: "893669581410",
-      appId: "1:893669581410:web:ebfdbdeacc27dced73673b",
-      measurementId: "G-6PH9HCPP9K"
-    };
+/* ---------------- AUTO REDIRECT IF LOGGED IN ---------------- */
+auth.onAuthStateChanged(user=>{
+ if(user){
+   window.location.href="explore.html";
+ }
+});
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-  </script>
+/* ---------------- LOGIN SUBMIT ---------------- */
+loginForm.addEventListener("submit",e=>{
+ e.preventDefault();
+ const email=loginEmail.value.trim();
+ const pass=loginPassword.value.trim();
 
-  <script src="app.js"></script>
+ loginStatus.textContent="";
+
+ auth.signInWithEmailAndPassword(email,pass)
+ .then(()=>{
+   loginStatus.style.color="#00ffa6";
+   loginStatus.textContent="Login successful ✓ Redirecting...";
+   setTimeout(()=>window.location.href="explore.html",600);
+ })
+ .catch(err=>{
+   loginStatus.style.color="#ff6ebf";
+   if(err.code==="auth/invalid-email") loginStatus.textContent="Invalid email format.";
+   else if(err.code==="auth/user-not-found") loginStatus.textContent="No account found.";
+   else if(err.code==="auth/wrong-password") loginStatus.textContent="Incorrect password.";
+   else loginStatus.textContent=err.message;
+ });
+});
+</script>
 
 </body>
 </html>
