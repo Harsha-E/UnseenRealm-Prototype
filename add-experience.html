@@ -91,15 +91,70 @@ input:focus,select:focus,textarea:focus{
 
 <body>
 
+<!-- ===================== FIREBASE INIT (CORRECT ORDER) ===================== -->
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig={
+  apiKey:"AIzaSyA7qrQeypEYFhKCvQjM-5PaMaYpTFJZ-mk",
+  authDomain:"unseenrealm-b43d9.firebaseapp.com",
+  projectId:"unseenrealm-b43d9",
+  storageBucket:"unseenrealm-b43d9.appspot.com",
+  messagingSenderId:"893669581410",
+  appId:"1:893669581410:web:ebfdbdeacc27dced73673b"
+};
+firebase.initializeApp(firebaseConfig);
+
+const auth=firebase.auth();
+const db=firebase.firestore();
+</script>
+
+<!-- ======================== NAVBAR ======================== -->
+
 <header class="nav">
   <div class="logo">Unseen<span>Realm</span></div>
-  <nav id="navLinks">
-    <a href="index.html">Home</a>
-    <a href="explore.html">Explore</a>
-    <a href="profile.html">Profile</a>
-    <a href="itinerary.html">Itinerary</a>
-  </nav>
+
+  <nav id="navLinks"></nav>
 </header>
+
+<script>
+// Build navbar dynamically after auth loads
+auth.onAuthStateChanged(user => {
+  const nav = document.getElementById("navLinks");
+
+  if(user){
+    nav.innerHTML = `
+      <a href="index.html">Home</a>
+      <a href="explore.html">Explore</a>
+      <a href="add-experience.html">Add Experience</a>
+      <a href="itinerary.html">Itinerary</a>
+      <a href="profile.html">Profile</a>
+      <a href="#" id="logoutBtn">Logout</a>
+    `;
+
+    document.getElementById("logoutBtn").onclick = async () => {
+      await auth.signOut();
+      location.href = "login.html";
+    };
+
+  } else {
+    nav.innerHTML = `
+      <a href="index.html">Home</a>
+      <a href="explore.html">Explore</a>
+      <a href="add-experience.html">Add Experience</a>
+      <a href="itinerary.html">Itinerary</a>
+      <a href="profile.html">Profile</a>
+      <a href="login.html">Login</a>
+      <a href="signup.html">Signup</a>
+    `;
+  }
+});
+</script>
+
+<!-- ======================== FORM ======================== -->
 
 <div class="container">
   <h1>Add New Experience</h1>
@@ -182,28 +237,13 @@ input:focus,select:focus,textarea:focus{
   <div id="status" class="status"></div>
 </div>
 
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<!-- ======================== FIRESTORE SAVE SCRIPT ======================== -->
 
 <script>
-const firebaseConfig={
-  apiKey:"AIzaSyA7qrQeypEYFhKCvQjM-5PaMaYpTFJZ-mk",
-  authDomain:"unseenrealm-b43d9.firebaseapp.com",
-  projectId:"unseenrealm-b43d9",
-  storageBucket:"unseenrealm-b43d9.appspot.com",
-  messagingSenderId:"893669581410",
-  appId:"1:893669581410:web:ebfdbdeacc27dced73673b"
-};
-firebase.initializeApp(firebaseConfig);
-const db=firebase.firestore();
-
-/* SAVE EXPERIENCE */
 document.getElementById("addForm").addEventListener("submit", async(e)=>{
   e.preventDefault();
 
-  let data={
+  const data={
     title:exTitle.value,
     city:exCity.value,
     description:exDesc.value,
@@ -221,7 +261,7 @@ document.getElementById("addForm").addEventListener("submit", async(e)=>{
     await db.collection("experiences").add(data);
     status.innerHTML="✔ Experience added successfully!";
     status.style.color="#00ffa6";
-    document.getElementById("addForm").reset();
+    addForm.reset();
   }
   catch(err){
     status.innerHTML=err.message;
