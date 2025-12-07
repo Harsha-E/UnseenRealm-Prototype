@@ -105,7 +105,11 @@ body{background:#0b0014;color:#fff;overflow-x:hidden}
  display:flex;justify-content:space-between;align-items:center;
  cursor:pointer;transition:.2s
 }
-.exp-card:hover{transform:scale(1.03)}
+.exp-card:hover{transform:scale(1.03);box-shadow:0 8px 25px rgba(255,0,245,.2)}
+.exp-card.selected{
+ background:linear-gradient(90deg,rgba(255,0,245,.15),rgba(0,225,255,.15));
+ border:2px solid #ff00f5;box-shadow:0 0 20px rgba(255,0,245,.4)
+}
 .exp-title{
  font-size:1.05rem;font-weight:700;
  background:linear-gradient(90deg,#ff00f5,#00e1ff);
@@ -149,6 +153,24 @@ body{background:#0b0014;color:#fff;overflow-x:hidden}
  from{transform:translate(-50%,-50%) scale(.6);opacity:.7}
  to{transform:translate(-50%,-50%) scale(1.7);opacity:0}
 }
+
+/* SELECTED MARKER */
+.selected-marker{
+ width:20px;height:20px;border-radius:50%;
+ background:#ff00f5;border:3px solid #fff;
+ box-shadow:0 0 20px #ff00f5,0 0 40px #ff00f5;
+ animation:pulse 2s infinite;
+ position:relative
+}
+.selected-marker::after{
+ content:'';position:absolute;
+ width:30px;height:30px;border-radius:50%;
+ border:2px solid rgba(255,0,245,.6);
+ top:50%;left:50%;transform:translate(-50%,-50%);
+ animation:ping-large 2s infinite ease-out
+}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+@keyframes ping-large{0%{transform:translate(-50%,-50%) scale(0.8);opacity:1}100%{transform:translate(-50%,-50%) scale(2);opacity:0}}
 
 /* LABELS & POPUP */
 .distance-label{
@@ -198,8 +220,8 @@ body{background:#0b0014;color:#fff;overflow-x:hidden}
   <nav id="navLinks">
     <a href="index.html" data-page="home">Home</a>
     <a href="profile.html" data-page="profile">Profile</a>
-    <a href="itinerary.html" data-page="itinerary" class="active">Itinerary</a>
-    <a href="explore.html" data-page="explore">Explore</a>
+    <a href="itinerary.html" data-page="itinerary">Itinerary</a>
+    <a href="explore.html" data-page="explore" class="active">Explore</a>
   </nav>
 </header>
 
@@ -327,13 +349,10 @@ hamburger.addEventListener('click', () => {
   navLinks.classList.toggle('active');
 });
 
-// Close mobile menu when clicking a link
 document.querySelectorAll('#navLinks a').forEach(link => {
   link.addEventListener('click', () => {
     hamburger.classList.remove('active');
     navLinks.classList.remove('active');
-    
-    // Set active page
     document.querySelectorAll('#navLinks a').forEach(l => l.classList.remove('active'));
     link.classList.add('active');
   });
@@ -349,6 +368,7 @@ let userLocation=[83.375183,17.7774363];
 let allFilteredExperiences = [];
 let visibleExperiences = [];
 let showCount = 0;
+let selectedExperience = null;
 const ITEMS_PER_PAGE = 5;
 
 /* EXPERIENCES DATA */
@@ -390,6 +410,7 @@ function hav(a,b,c,d){
 let map3d;
 let markers=[];
 let userMarker;
+let selectedMarker = null;
 
 function initMap(){
  map3d=new maplibregl.Map({
@@ -420,6 +441,31 @@ function placeUserMarker(){
  userMarker=new maplibregl.Marker({element:pin}).setLngLat(userLocation).addTo(map3d);
 }
 
+function flyToLocation(experience){
+ if(!map3d) return;
+ 
+ // Clear previous selected marker
+ if(selectedMarker){
+  selectedMarker.remove();
+  selectedMarker = null;
+ }
+ 
+ // Create highlighted selected marker
+ let selectedPin=document.createElement("div");
+ selectedPin.className="selected-marker";
+ selectedMarker = new maplibregl.Marker({element:selectedPin}).setLngLat([experience.mapX, experience.mapY]).addTo(map3d);
+ 
+ // Smooth fly to location
+ map3d.flyTo({
+  center: [experience.mapX, experience.mapY],
+  zoom: 16,
+  pitch: 60,
+  bearing: -20,
+  duration: 1500,
+  essential: true
+ });
+}
+
 function addMarkers(arr){
  markers.forEach(m=>m.remove());
  markers=[];
@@ -429,9 +475,6 @@ function addMarkers(arr){
   dot.style.cssText=`width:14px;height:14px;border-radius:50%;background:${col};box-shadow:0 0 12px ${col}`;
   let m1=new maplibregl.Marker({element:dot}).setLngLat([e.mapX,e.mapY]).addTo(map3d);
   markers.push(m1);
-
-  let d=hav(userLocation[1],userLocation[0],e.mapY,e.mapX).toFixed(1);
-  dot.onclick=()=>openPopup(e,d);
  });
 }
 
@@ -452,6 +495,22 @@ function openPopup(data,d){
  popupOverlay.style.display="block";
  popupBox.style.display="block";
 }
+
+/* SELECT EXPERIENCE */
+window.selectExperience = function(experience, d){
+ // Highlight card
+ document.querySelectorAll('.exp-card').forEach(card => card.classList.remove('selected'));
+ const card = document.querySelector(`[data-id="${experience.id}"]`);
+ if(card) card.classList.add('selected');
+ 
+ // Fly map to location
+ flyToLocation(experience);
+ 
+ // Open popup
+ openPopup(experience, d);
+ 
+ selectedExperience = experience;
+};
 
 popupOverlay.onclick=()=>{popupOverlay.style.display="none";popupBox.style.display="none"};
 popupClose.onclick=()=>{popupOverlay.style.display="none";popupBox.style.display="none"};
@@ -507,7 +566,7 @@ function renderList(){
  visibleExperiences.slice(0, showCount).forEach(e=>{
   let d=hav(userLocation[1],userLocation[0],e.mapY,e.mapX).toFixed(1);
   listBox.innerHTML+=`
-   <div class="exp-card" onclick="openPopup(${JSON.stringify(e).replace(/"/g, '&quot;')},${d})">
+   <div class="exp-card" data-id="${e.id}" onclick="selectExperience(${JSON.stringify(e).replace(/"/g, '&quot;')},${d})">
      <div>
        <div class="exp-title">${e.title}</div>
        <div class="exp-city">${e.city} • ${d} km</div>
