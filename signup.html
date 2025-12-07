@@ -1,112 +1,255 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Sign Up • UnseenRealm</title>
+<meta charset="UTF-8">
+<title>Sign Up • UnseenRealm</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
+body{
+ background:#0b0014;color:#fff;min-height:100vh;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;
+ overflow:hidden;position:relative;
+}
 
-  <link rel="stylesheet" href="styles.css" />
+/* BACKGROUND GLOW */
+body::before,body::after{
+ content:"";position:absolute;inset:0;z-index:-2;
+}
+body::before{
+ background:
+   radial-gradient(circle at 20% 20%,#ff00f530,transparent 45%),
+   radial-gradient(circle at 80% 80%,#00e1ff30,transparent 50%),
+   #0b0014;
+}
+body::after{
+ background:radial-gradient(circle,#ff00f550,transparent 60%);
+ mix-blend-mode:screen;filter:blur(130px);
+ animation:bgPulse 9s infinite alternate;
+}
+@keyframes bgPulse{0%{opacity:.4}100%{opacity:.92}}
+
+/* FLOATING DOTS */
+.dot-field{position:absolute;inset:0;z-index:-1;pointer-events:none}
+.dot{
+ position:absolute;width:6px;height:6px;border-radius:50%;
+ background:#ff00f5;filter:blur(2px);opacity:.7;
+ animation:float 6s infinite ease-in-out;
+}
+.dot:nth-child(3n){background:#00e1ff}
+@keyframes float{
+ 0%{transform:translateY(0)}
+ 50%{transform:translateY(-35px) scale(1.3)}
+ 100%{transform:translateY(0)}
+}
+
+/* NAVBAR */
+.nav{
+ position:fixed;top:0;width:100%;padding:1rem 2rem;
+ display:flex;justify-content:space-between;align-items:center;
+ background:rgba(0,0,0,.3);backdrop-filter:blur(14px);
+ z-index:200;
+}
+.logo{font-size:1.7rem;font-weight:800}
+.logo span{color:#ff00f5}
+#navLinks a{
+ color:#fff;margin-left:1rem;text-decoration:none;font-size:.95rem;position:relative;
+}
+#navLinks a::after{
+ content:"";position:absolute;bottom:-3px;left:0;width:0;height:2px;
+ background:#ff00f5;transition:.25s;
+}
+#navLinks a:hover::after{width:100%}
+
+/* CARD */
+.auth-page{
+ width:92%;max-width:380px;margin-top:6rem;
+ padding:2rem 2.2rem;border-radius:22px;
+ background:rgba(255,255,255,.07);
+ backdrop-filter:blur(20px);
+ border:1px solid rgba(255,255,255,.12);
+ box-shadow:0 0 30px rgba(255,0,245,.25);
+ animation:fadeUp .5s ease-out;
+}
+@keyframes fadeUp{
+ from{opacity:0;transform:translateY(35px)}
+ to{opacity:1;transform:translateY(0)}
+}
+
+h1{
+ font-size:2rem;font-weight:800;
+ background:linear-gradient(90deg,#ff00f5,#00e1ff);
+ -webkit-background-clip:text;color:transparent;
+ margin-bottom:.4rem;
+}
+.text-muted{
+ color:#bbb;font-size:.9rem;margin-bottom:1.4rem;
+}
+
+/* INPUT FIELDS */
+.field{margin-bottom:1.2rem}
+label{font-size:.85rem;color:#ddd;margin-bottom:.3rem;display:block}
+input{
+ width:100%;padding:.85rem 1rem;border-radius:12px;
+ background:rgba(255,255,255,.08);
+ border:1px solid rgba(255,255,255,.22);
+ color:#fff;font-size:.9rem;transition:.25s;
+}
+input:focus{
+ border-color:#ff00f5;
+ box-shadow:0 0 14px #ff00f566;
+ outline:none;
+}
+
+/* BUTTON */
+.btn-primary{
+ width:100%;padding:.95rem;border-radius:12px;
+ background:linear-gradient(90deg,#ff00f5,#00e1ff);
+ border:none;color:#fff;font-weight:700;font-size:1.05rem;
+ cursor:pointer;transition:.25s;
+}
+.btn-primary:hover{
+ transform:scale(1.03);
+ box-shadow:0 0 24px rgba(255,0,245,.45)
+}
+.btn-primary:active{transform:scale(.96)}
+
+/* ALT */
+.auth-alt{text-align:center;margin-top:1rem;color:#bbb;font-size:.85rem}
+.auth-alt a{color:#00e1ff;text-decoration:none}
+.auth-alt a:hover{text-decoration:underline}
+
+/* STATUS */
+.auth-status{
+ min-height:1rem;margin-top:.8rem;
+ font-size:.85rem;text-align:center;color:#ff7cd9;
+}
+
+/* MOBILE */
+@media(max-width:480px){
+ .auth-page{margin-inline:1rem;padding:1.7rem 1.5rem}
+}
+</style>
 </head>
 
-<body class="theme-dark">
+<body>
 
-  <!-- NAVBAR -->
-  <header class="nav">
-    <div class="logo">Unseen<span>Realm</span></div>
-    <nav id="navLinks"></nav>
-  </header>
+<!-- NAV -->
+<header class="nav">
+ <div class="logo">Unseen<span>Realm</span></div>
+ <nav id="navLinks">
+   <a href="index.html">Home</a>
+   <a href="login.html">Login</a>
+ </nav>
+</header>
 
-  <!-- SIGNUP SECTION -->
-  <main class="auth-page">
-    <section class="auth-card">
+<!-- DOTS -->
+<div class="dot-field">
+ <div class="dot" style="top:20%;left:12%"></div>
+ <div class="dot" style="top:60%;left:70%"></div>
+ <div class="dot" style="top:78%;left:28%"></div>
+ <div class="dot" style="top:38%;left:88%"></div>
+ <div class="dot" style="top:12%;left:55%"></div>
+</div>
 
-      <h1>Create Your Account</h1>
-      <p class="text-muted tiny">
-        Personalize your recommendations & sync itineraries across devices.
-      </p>
+<!-- SIGNUP CARD -->
+<main class="auth-page">
 
-      <!-- SIGNUP FORM -->
-      <form id="signupForm" class="auth-form">
+ <h1>Create Account</h1>
+ <p class="text-muted">Personalize your hidden-experience feed.</p>
 
-        <div class="field">
-          <label for="suName">Your Name</label>
-          <input
-            id="suName"
-            type="text"
-            required
-            placeholder="Vizag Explorer"
-            autocomplete="name"
-          />
-        </div>
+ <form id="signupForm">
+   <div class="field">
+     <label>Your Name</label>
+     <input id="suName" type="text" required placeholder="Vizag Explorer">
+   </div>
 
-        <div class="field">
-          <label for="suEmail">Email</label>
-          <input
-            id="suEmail"
-            type="email"
-            required
-            placeholder="you@example.com"
-            autocomplete="email"
-          />
-        </div>
+   <div class="field">
+     <label>Email</label>
+     <input id="suEmail" type="email" required placeholder="you@example.com">
+   </div>
 
-        <div class="field">
-          <label for="suPassword">Password</label>
-          <input
-            id="suPassword"
-            type="password"
-            required
-            placeholder="••••••••"
-            autocomplete="new-password"
-          />
-        </div>
+   <div class="field">
+     <label>Password</label>
+     <input id="suPassword" type="password" required placeholder="Minimum 6 characters">
+   </div>
 
-        <button type="submit" class="btn-primary full-width signup-btn">
-          Create Account
-        </button>
-      </form>
+   <button class="btn-primary" type="submit">Create Account</button>
+ </form>
 
-      <!-- LOGIN LINK -->
-      <p class="auth-alt tiny">
-        Already have an account?
-        <a href="login.html" class="link-accent">Log in</a>
-      </p>
+ <p class="auth-alt">
+   Already registered?
+   <a href="login.html">Log in</a>
+ </p>
 
-      <!-- STATUS MESSAGE -->
-      <p id="signupStatus" class="auth-status tiny"></p>
+ <p id="signupStatus" class="auth-status"></p>
 
-    </section>
-  </main>
+</main>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    Secure signup powered by Firebase Authentication
-  </footer>
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
-  <!-- FIREBASE -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script>
+/* INIT */
+const firebaseConfig={
+ apiKey:"AIzaSyA7qrQeypEYFhKCvQjM-5PaMaYpTFJZ-mk",
+ authDomain:"unseenrealm-b43d9.firebaseapp.com",
+ projectId:"unseenrealm-b43d9",
+ storageBucket:"unseenrealm-b43d9.firebasestorage.app",
+ messagingSenderId:"893669581410",
+ appId:"1:893669581410:web:ebfdbdeacc27dced73673b"
+};
+firebase.initializeApp(firebaseConfig);
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyA7qrQeypEYFhKCvQjM-5PaMaYpTFJZ-mk",
-      authDomain: "unseenrealm-b43d9.firebaseapp.com",
-      projectId: "unseenrealm-b43d9",
-      storageBucket: "unseenrealm-b43d9.firebasestorage.app",
-      messagingSenderId: "893669581410",
-      appId: "1:893669581410:web:ebfdbdeacc27dced73673b",
-      measurementId: "G-6PH9HCPP9K"
-    };
+const auth=firebase.auth();
+const db=firebase.firestore();
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-  </script>
+/* AUTO REDIRECT IF ALREADY LOGGED IN */
+auth.onAuthStateChanged(u=>{
+ if(u) location.href="explore.html";
+});
 
-  <!-- APP LOGIC -->
-  <script src="app.js"></script>
+/* SIGN UP */
+signupForm.addEventListener("submit",async(e)=>{
+ e.preventDefault();
+
+ const name=suName.value.trim();
+ const email=suEmail.value.trim();
+ const pass=suPassword.value;
+
+ signupStatus.style.color="#ff7cd9";
+ signupStatus.textContent="Creating account...";
+
+ if(pass.length<6){
+   signupStatus.textContent="Password must be at least 6 characters.";
+   return;
+ }
+
+ try{
+   const res=await auth.createUserWithEmailAndPassword(email,pass);
+
+   await db.collection("users").doc(res.user.uid).set({
+     name,email,
+     interests:[],
+     mood:"any",
+     createdAt:Date.now()
+   });
+
+   signupStatus.style.color="#00ffa6";
+   signupStatus.textContent="Account created! Redirecting...";
+   setTimeout(()=>location.href="profile.html",900);
+
+ }catch(err){
+   signupStatus.style.color="#ff6ec7";
+   if(err.code==="auth/email-already-in-use")
+     signupStatus.textContent="Email already exists.";
+   else signupStatus.textContent=err.message;
+ }
+});
+</script>
 
 </body>
 </html>
