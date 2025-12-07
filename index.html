@@ -1,100 +1,113 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>UnseenRealm – Discover Hidden Experiences</title>
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>UnseenRealm</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
+body{background:#0b0014;color:#fff;overflow-x:hidden;position:relative}
+body::before,body::after{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none}
+body::before{background:radial-gradient(circle at 30% 20%,#ff00f540 0%,transparent 45%),radial-gradient(circle at 70% 80%,#00e1ff40 0%,transparent 50%),#0b0014}
+body::after{background:radial-gradient(circle,#ff00f550 0%,transparent 60%);mix-blend-mode:screen;filter:blur(80px);animation:gp 8s infinite ease-in-out}
+@keyframes gp{0%{opacity:.4}50%{opacity:.9}100%{opacity:.4}}
+.dot-field{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.dot{position:absolute;width:6px;height:6px;border-radius:50%;background:#ff00f5;filter:blur(2px);opacity:.7;animation:fd 6s infinite ease-in-out}
+.dot:nth-child(3n){background:#00e1ff}
+@keyframes fd{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-40px) scale(1.4);opacity:.4}100%{transform:translateY(0) scale(1);opacity:.7}}
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+.nav{position:fixed;top:0;left:0;width:100%;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.35);backdrop-filter:blur(14px);z-index:50}
+.logo{font-size:1.6rem;font-weight:800;color:#fff}
+.logo span{color:#ff00f5}
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="styles.css" />
-</head>
+#navLinks a{margin-left:1.4rem;color:#fff;text-decoration:none;font-size:.95rem;position:relative}
+#navLinks a::after{content:"";position:absolute;left:0;bottom:-3px;width:0;height:2px;background:#ff00f5;transition:.2s}
+#navLinks a:hover::after{width:100%}
+#navLinks a:hover{color:inherit}
 
-<body class="theme-dark">
-  <!-- NAV -->
-  <header class="nav">
-    <div class="logo">Unseen<span>Realm</span></div>
-    <nav id="navLinks"></nav>
-  </header>
+.hero{padding:8rem 2rem 4rem;display:grid;grid-template-columns:1fr 1fr;align-items:center;max-width:1200px;margin:auto;gap:2rem;position:relative;z-index:2}
 
-  <!-- HERO -->
-  <main class="hero">
-    <section class="hero-text">
-      <h1>Unlock the <span>unseen realm</span> of every city.</h1>
-      <p>
-        AI-powered hidden experience discovery. Skip clichés and explore
-        underground food corners, secret rooftops, and local-only adventures
-        curated in real-time.
-      </p>
+.hero h1{font-size:3rem;line-height:1.1;background:linear-gradient(90deg,#ff00f5,#00e1ff);-webkit-background-clip:text;color:transparent;margin-bottom:1rem}
+.hero p{color:#ccc;max-width:420px;line-height:1.6;margin-bottom:2rem}
 
-      <div class="hero-actions">
-        <a href="explore.html" class="btn-primary">Start Exploring</a>
-        <a href="login.html" class="btn-ghost">Personalize with AI</a>
-      </div>
-    </section>
+.cta{display:flex;gap:1rem;flex-wrap:wrap}
 
-    <section class="hero-visual">
-      <div class="glass-card">
-        <p class="pill">Tonight in your realm</p>
-        <h2>Hidden Rooftop Open Mic</h2>
-        <p class="muted">Live music • Street food • City view</p>
-      </div>
+.btn-primary{padding:.9rem 1.7rem;border-radius:50px;font-weight:600;text-decoration:none;color:#fff;background:linear-gradient(90deg,#ff00f5,#00e1ff)}
+.btn-ghost{padding:.9rem 1.7rem;border-radius:50px;font-weight:600;text-decoration:none;color:#fff;border:1px solid #fff}
 
-      <div class="blur-orbit"></div>
-      <div class="blur-orbit second"></div>
-    </section>
-  </main>
+.holo-card{width:100%;max-width:320px;margin:auto;background:rgba(255,255,255,0.06);padding:1.6rem;border-radius:22px;backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.15);box-shadow:0 0 30px rgba(255,0,245,0.3)}
+.holo-pill{padding:.3rem .9rem;border-radius:50px;font-size:.7rem;background:rgba(255,255,255,0.1);display:inline-block;margin-bottom:.7rem}
+.holo-card h2{font-size:1.3rem;margin-bottom:.4rem}
+.holo-card p{color:#d8d8d8;font-size:.9rem}
 
-  <!-- FEATURES -->
-  <section class="features">
-    <h2>Why UnseenRealm?</h2>
+.features{padding:5rem 2rem;max-width:1200px;margin:auto;text-align:center;z-index:2;position:relative}
+.features h2{font-size:2rem;font-weight:800;margin-bottom:3rem;background:linear-gradient(90deg,#00e1ff,#ff00f5);-webkit-background-clip:text;color:transparent}
 
-    <div class="feature-grid">
-      <div class="feature-card">
-        <h3>AI-Powered Discovery</h3>
-        <p>Smart suggestions based on your interests, preferences and mood.</p>
-      </div>
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem}
 
-      <div class="feature-card">
-        <h3>Map-First Experience</h3>
-        <p>See hidden gems visualized beautifully on a live interactive map grid.</p>
-      </div>
+.feature-card{padding:2rem;border-radius:20px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(18px);box-shadow:0 0 20px rgba(255,0,245,0.2);transition:.25s}
+.feature-card:hover{transform:translateY(-4px) scale(1.03);box-shadow:0 0 30px rgba(255,0,245,0.4)}
+.feature-card h3{font-size:1.2rem;margin-bottom:.6rem;position:relative}
+.feature-card p{font-size:.9rem;color:#ccc;line-height:1.5}
 
-      <div class="feature-card">
-        <h3>Local-Only Vibes</h3>
-        <p>Experiences recommended by locals — crafted, not marketed.</p>
-      </div>
-    </div>
-  </section>
+.footer{padding:2rem;text-align:center;color:#ccc}
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <p>Built by Ollivanders WizardOps · Powered by HTML · CSS · JS · Firebase</p>
-  </footer>
+@media(max-width:900px){
+.hero{grid-template-columns:1fr;text-align:center}
+.holo-card{margin-top:2rem}
+.hero h1{font-size:2.4rem}
+.feature-grid{grid-template-columns:1fr}
+}
+</style></head>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<body>
 
-  <!-- Firebase Config -->
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyA7qrQeypEYFhKCvQjM-5PaMaYpTFJZ-mk",
-      authDomain: "unseenrealm-b43d9.firebaseapp.com",
-      projectId: "unseenrealm-b43d9",
-      storageBucket: "unseenrealm-b43d9.firebasestorage.app",
-      messagingSenderId: "893669581410",
-      appId: "1:893669581410:web:ebfdbdeacc27dced73673b",
-      measurementId: "G-6PH9HCPP9K"
-    };
+<header class="nav">
+<div class="logo">Unseen<span>Realm</span></div>
+<nav id="navLinks"><a href="explore.html">Explore</a><a href="login.html">Login</a><a href="profile.html">Profile</a></nav>
+</header>
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-  </script>
+<div class="dot-field">
+<div class="dot" style="top:12%;left:20%;animation-delay:.2s"></div>
+<div class="dot" style="top:30%;left:75%;animation-delay:.5s"></div>
+<div class="dot" style="top:55%;left:10%;animation-delay:1s"></div>
+<div class="dot" style="top:72%;left:40%;animation-delay:1.4s"></div>
+<div class="dot" style="top:22%;left:60%;animation-delay:2s"></div>
+<div class="dot" style="top:80%;left:85%;animation-delay:2.4s"></div>
+<div class="dot" style="top:40%;left:50%;animation-delay:3s"></div>
+</div>
 
-  <!-- App Logic -->
-  <script src="app.js"></script>
-</body>
-</html>
+<main class="hero">
+<section>
+<h1>Unlock the unseen realm of every city</h1>
+<p>AI-powered discovery revealing hidden rooftops, underground cafés, neon micro-scenes and local-only experiences based on your vibe.</p>
+<div class="cta"><a href="explore.html" class="btn-primary">Start Exploring</a><a href="login.html" class="btn-ghost">Personalize</a></div>
+</section>
+
+<section style="display:flex;justify-content:center">
+<div class="holo-card">
+<div class="holo-pill">Tonight</div>
+<h2>Hidden Rooftop Open Mic</h2>
+<p>Live music • Neon skyline • Street food</p>
+</div>
+</section>
+</main>
+
+<section class="features">
+<h2>Why UnseenRealm?</h2>
+<div class="feature-grid">
+<div class="feature-card"><h3>AI-Powered Discovery</h3><p>Smart suggestions shaped by mood and interests.</p></div>
+<div class="feature-card"><h3>Map-Centric Navigation</h3><p>Interactive glowing maps revealing hidden gems.</p></div>
+<div class="feature-card"><h3>Local Authenticity</h3><p>Experiences shared by real explorers, not ads.</p></div>
+</div>
+</section>
+
+<footer class="footer">Built with passion · Powered by Firebase</footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig={apiKey:"AIzaSyA7qrQeypEYFhKCvQjM-5PaMaYpTFJZ-mk",authDomain:"unseenrealm-b43d9.firebaseapp.com",projectId:"unseenrealm-b43d9",storageBucket:"unseenrealm-b43d9.firebasestorage.app",messagingSenderId:"893669581410",appId:"1:893669581410:web:ebfdbdeacc27dced73673b",measurementId:"G-6PH9HCPP9K"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(),db=firebase.firestore();
+</script>
+<script type="module" src="scripts/app.js"></script>
+</body></html>
