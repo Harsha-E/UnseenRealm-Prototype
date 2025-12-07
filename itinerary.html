@@ -1,75 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <title>Itinerary • UnseenRealm</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Your Itinerary • UnseenRealm</title>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
+body{
+  background:#0b0014;color:#fff;min-height:100vh;
+  overflow-x:hidden;display:flex;flex-direction:column;align-items:center;
+}
 
-  <link rel="stylesheet" href="styles.css" />
+/* Background Glow */
+body::before,body::after{
+  content:"";position:fixed;inset:0;z-index:-2;
+}
+body::before{
+  background:
+    radial-gradient(circle at 15% 20%,#ff00f540,transparent 50%),
+    radial-gradient(circle at 80% 80%,#00e1ff40,transparent 55%),
+    #0b0014;
+}
+body::after{
+  background:radial-gradient(circle,#ff00f560,transparent 60%);
+  mix-blend-mode:screen;filter:blur(130px);
+  animation:bg 9s infinite alternate;
+}
+@keyframes bg{from{opacity:.5} to{opacity:.95}}
+
+/* NAV */
+.nav{
+  position:fixed;top:0;width:100%;padding:1rem 2rem;
+  display:flex;justify-content:space-between;align-items:center;
+  background:rgba(0,0,0,.35);backdrop-filter:blur(12px);
+  z-index:50;
+}
+.logo{font-size:1.7rem;font-weight:800}
+.logo span{color:#ff00f5}
+#navLinks a{
+  margin-left:1rem;color:#fff;text-decoration:none;font-size:.95rem;position:relative;
+}
+#navLinks a::after{
+  content:"";position:absolute;left:0;bottom:-3px;width:0;height:2px;
+  background:#ff00f5;transition:.25s;
+}
+#navLinks a:hover::after{width:100%}
+
+/* PAGE AREA */
+.page{
+  width:100%;max-width:850px;margin-top:7rem;padding:1.5rem;
+}
+
+/* HEADER */
+.page h1{
+  font-size:2.2rem;font-weight:800;margin-bottom:.5rem;
+  background:linear-gradient(90deg,#ff00f5,#00e1ff);
+  -webkit-background-clip:text;color:transparent;
+}
+.page p{color:#ccc;margin-bottom:1.8rem}
+
+/* ITEM CARD */
+.card{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.15);
+  padding:1.3rem;border-radius:20px;margin-bottom:1rem;
+  backdrop-filter:blur(10px);
+  display:flex;justify-content:space-between;align-items:center;
+  transition:.25s;
+}
+.card:hover{transform:scale(1.02)}
+
+.card-left{max-width:70%}
+.card-title{
+  font-size:1.25rem;font-weight:700;
+  background:linear-gradient(90deg,#ff00f5,#00e1ff);
+  -webkit-background-clip:text;color:transparent;
+}
+.card-city{color:#aaa;font-size:.9rem;margin:.2rem 0}
+.card-desc{color:#ddd;font-size:.9rem;margin-top:.2rem}
+
+/* BUTTON ROW */
+.btn-row{
+  display:flex;flex-direction:column;gap:.5rem;
+}
+
+.btn-small{
+  padding:.55rem .8rem;border:none;border-radius:12px;
+  cursor:pointer;font-weight:600;font-size:.85rem;color:#fff;
+  background:linear-gradient(90deg,#ff00f5,#00e1ff);
+  transition:.2s;text-align:center;
+}
+.btn-small:hover{transform:scale(1.05)}
+
+.delete-btn{
+  background:#ff0033dd;
+}
+.delete-btn:hover{background:#ff3355}
+
+/* EMPTY STATE */
+.empty{
+  text-align:center;margin-top:3rem;color:#999;font-size:1rem;
+}
+
+/* MOBILE */
+@media(max-width:600px){
+  .card{flex-direction:column;align-items:flex-start;gap:1rem}
+  .card-left{max-width:100%}
+  .btn-row{flex-direction:row}
+}
+</style>
+
 </head>
 
-<body class="theme-dark">
+<body>
 
-  <!-- NAV -->
-  <header class="nav">
-    <div class="logo">Unseen<span>Realm</span></div>
-    <nav id="navLinks"></nav>
-  </header>
+<header class="nav">
+  <div class="logo">Unseen<span>Realm</span></div>
+  <nav id="navLinks">
+    <a href="index.html">Home</a>
+    <a href="explore.html">Explore</a>
+    <a href="profile.html">Profile</a>
+    <a href="itinerary.html">Itinerary</a>
+  </nav>
+</header>
 
-  <!-- ITINERARY -->
-  <main class="itinerary-page">
-    <section class="itinerary-card">
+<!-- MAIN SECTION -->
+<div class="page">
+  <h1>Your Saved Itinerary</h1>
+  <p>All experiences you marked are stored here. Plan your journey in one place.</p>
 
-      <div class="itinerary-header">
-        <div>
-          <h1>Your Saved Path</h1>
-          <p class="muted tiny">
-            Spots you’ve saved along your journey. Plan your perfect outing.
-          </p>
+  <div id="itineraryList"></div>
+  <div id="emptyState" class="empty" style="display:none;">No items saved yet.</div>
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+<script>
+/* FIREBASE INIT */
+const firebaseConfig={
+ apiKey:"AIzaSyA7qrQeypEYFhKCvQjM-5PaMaYpTFJZ-mk",
+ authDomain:"unseenrealm-b43d9.firebaseapp.com",
+ projectId:"unseenrealm-b43d9",
+ storageBucket:"unseenrealm-b43d9.appspot.com",
+ messagingSenderId:"893669581410",
+ appId:"1:893669581410:web:ebfdbdeacc27dced73673b",
+};
+firebase.initializeApp(firebaseConfig);
+
+const auth=firebase.auth();
+const db=firebase.firestore();
+
+/* LOAD ITINERARY */
+auth.onAuthStateChanged(async(user)=>{
+  if(!user){
+    document.getElementById("emptyState").innerHTML="Login to view saved items.";
+    document.getElementById("emptyState").style.display="block";
+    return;
+  }
+
+  const list=document.getElementById("itineraryList");
+  list.innerHTML="";
+
+  const snap=await db.collection("users")
+    .doc(user.uid)
+    .collection("itinerary")
+    .orderBy("timestamp","desc")
+    .get();
+
+  if(snap.empty){
+    document.getElementById("emptyState").style.display="block";
+    return;
+  }
+
+  snap.forEach(doc=>{
+    let e=doc.data();
+
+    list.innerHTML+=`
+      <div class="card">
+        <div class="card-left">
+          <div class="card-title">${e.title}</div>
+          <div class="card-city">${e.city}</div>
+          <div class="card-desc">${e.description}</div>
         </div>
 
-        <button id="clearItinerary" class="btn-sm">Clear All</button>
+        <div class="btn-row">
+          <button class="btn-small" onclick="openMaps(${e.lat},${e.lng})">
+            Open in Maps
+          </button>
+          <button class="btn-small delete-btn" onclick="deleteItem('${doc.id}')">
+            Delete
+          </button>
+        </div>
       </div>
+    `;
+  });
+});
 
-      <div id="itineraryList" class="itinerary-list"></div>
+/* OPEN MAPS */
+function openMaps(lat,lng){
+  window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
+}
 
-      <p id="itineraryStatus"
-         class="muted tiny"
-         style="margin-top:1rem;min-height:1em;"></p>
+/* DELETE ITEM */
+async function deleteItem(id){
+  const user=auth.currentUser;
+  if(!user) return;
 
-    </section>
-  </main>
+  await db.collection("users")
+          .doc(user.uid)
+          .collection("itinerary")
+          .doc(id)
+          .delete();
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <p>Your itinerary is synced locally and restored automatically.</p>
-  </footer>
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-
-  <!-- Firebase Config -->
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyA7qrQeypEYFhKCvQjM-5PaMaYpTFJZ-mk",
-      authDomain: "unseenrealm-b43d9.firebaseapp.com",
-      projectId: "unseenrealm-b43d9",
-      storageBucket: "unseenrealm-b43d9.firebasestorage.app",
-      messagingSenderId: "893669581410",
-      appId: "1:893669581410:web:ebfdbdeacc27dced73673b",
-      measurementId: "G-6PH9HCPP9K"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-  </script>
-
-  <!-- App Logic -->
-  <script src="app.js"></script>
+  location.reload();
+}
+</script>
 
 </body>
 </html>
