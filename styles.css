@@ -539,3 +539,95 @@ h1, h2, h3 {
   background:rgba(255,255,255,0.03);
   border-top:1px solid var(--border-0);
 }
+#budgetFilter.select,
+#crowdFilter.select{
+background:#000;
+color:#fff;
+border:1px solid rgba(255,255,255,.25);
+}
+#budgetFilter.select:focus,
+#crowdFilter.select:focus{
+border-color:#ff00f5;
+}
+.exp-card {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  position:relative;
+}
+
+.exp-left {
+  width:80%;
+}
+
+.like-btn {
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.15);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.like-btn svg {
+  width:20px;
+  fill:#aaa;
+  transition:0.25s;
+}
+
+.like-btn:hover {
+  transform:scale(1.15);
+}
+
+.like-btn.saved svg {
+  fill:#ff00f5;
+  filter:drop-shadow(0 0 6px #ff00f5);
+}
+.exp-card{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:1rem;
+}
+
+.exp-left{
+ flex:1;
+}
+
+.like-btn{
+ width:42px;
+ height:42px;
+ border-radius:50%;
+ background:rgba(255,255,255,.08);
+ border:1px solid rgba(255,255,255,.15);
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ cursor:pointer;
+ transition:.25s;
+}
+
+.like-btn svg{
+ width:22px;
+ fill:#bbb;
+ transition:.25s;
+}
+
+.like-btn:hover{
+ transform:scale(1.12);
+ background:rgba(255,0,245,.15);
+}
+
+.like-btn.saved svg{
+ fill:#ff00f5;
+ filter:drop-shadow(0 0 8px #ff00f5);
+}
+
+.like-btn.saved{
+ background:rgba(255,0,245,.25);
+ border-color:#ff00f5;
+}
